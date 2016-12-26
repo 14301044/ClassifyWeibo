@@ -27,7 +27,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * ÑµÁ·Æ÷
+ * è®­ç»ƒå™¨
  * 
  * 
  */
@@ -36,20 +36,21 @@ class ClassifyWeibo {
 	// Dao
 	UserDAO userDao = new UserDAOImpl();
 	WeiboDAO weiboDao = new WeiboDAOImpl();
-	// Àà±ğĞòºÅ¶ÔÓ¦µÄÊµ¼ÊÃû³Æ
+	RecommendDAO recommendDAO = new RecommendDAOImpl();
+	// ç±»åˆ«åºå·å¯¹åº”çš„å®é™…åç§°
 	private Map<String, String> classMap = new HashMap<String, String>();
-	// Àà±ğ¶ÔÓ¦µÄtxtÎÄ±¾Êı
+	// ç±»åˆ«å¯¹åº”çš„txtæ–‡æœ¬æ•°
 	private Map<String, Integer> classP = new ConcurrentHashMap<String, Integer>();
-	// ËùÓĞÎÄ±¾Êı
+	// æ‰€æœ‰æ–‡æœ¬æ•°
 	private AtomicInteger actCount = new AtomicInteger(0);
-	// Ã¿¸öÀà±ğ¶ÔÓ¦µÄ´ÊµäºÍÆµÊı
+	// æ¯ä¸ªç±»åˆ«å¯¹åº”çš„è¯å…¸å’Œé¢‘æ•°
 	private Map<String, Map<String, Double>> classWordMap = new ConcurrentHashMap<String, Map<String, Double>>();
-	// ÑµÁ·¼¯µÄÎ»ÖÃ
+	// è®­ç»ƒé›†çš„ä½ç½®
 	private String trainPath = "\\sina";
-	// ·Ö´ÊÆ÷ÊôĞÔ
+	// åˆ†è¯å™¨å±æ€§
 	private List<String> ls = new ArrayList<String>();
 	private Map<String, Integer> dic = new HashMap<String, Integer>();
-	private int maxwl;// ÉèÖÃ´ÊµÄ×î´ó³¤¶È
+	private int maxwl;// è®¾ç½®è¯çš„æœ€å¤§é•¿åº¦
 
 	private static ClassifyWeibo train = new ClassifyWeibo();
 
@@ -58,13 +59,13 @@ class ClassifyWeibo {
 	}
 
 	private ClassifyWeibo() {
-		// ³õÊ¼»¯Àà±ğ
+		// åˆå§‹åŒ–ç±»åˆ«
 		loadDic();
 		realTrain();
 	}
 
 	/**
-	 * ¼ÓÔØ´Êµä
+	 * åŠ è½½è¯å…¸
 	 */
 	private void loadDic() {
 		BufferedReader br = null;
@@ -129,27 +130,27 @@ class ClassifyWeibo {
 	}
 
 	/**
-	 * ÑµÁ·Êı¾İ
+	 * è®­ç»ƒæ•°æ®
 	 */
 	private void realTrain() {
-		// ³õÊ¼»¯
+		// åˆå§‹åŒ–
 		classMap = new HashMap<String, String>();
 		classP = new HashMap<String, Integer>();
 		actCount.set(0);
 		classWordMap = new HashMap<String, Map<String, Double>>();
 
-		classMap.put("C000001", "Æû³µ");
-		classMap.put("C000002", "ÎÄ»¯");
-		classMap.put("C000003", "¾­¼Ã");
-		classMap.put("C000004", "Ò½Ò©");
-		classMap.put("C000005", "¾üÊÂ");
-		classMap.put("C000006", "ÌåÓı");
+		classMap.put("C000001", "æ±½è½¦");
+		classMap.put("C000002", "æ–‡åŒ–");
+		classMap.put("C000003", "ç»æµ");
+		classMap.put("C000004", "åŒ»è¯");
+		classMap.put("C000005", "å†›äº‹");
+		classMap.put("C000006", "ä½“è‚²");
 
-		// ¼ÆËã¸÷¸öÀà±ğµÄÑù±¾Êı
+		// è®¡ç®—å„ä¸ªç±»åˆ«çš„æ ·æœ¬æ•°
 		Set<String> keySet = classMap.keySet();
 
 		
-		// ´æ·ÅÃ¿¸öÀà±ğµÄÎÄ¼ş´Ê»ãÄÚÈİ
+		// å­˜æ”¾æ¯ä¸ªç±»åˆ«çš„æ–‡ä»¶è¯æ±‡å†…å®¹
 		final Map<String, List<List<String>>> classContentMap = new ConcurrentHashMap<String, List<List<String>>>();
 		for (String classKey : keySet) {
 			Map<String, Double> wordMap = new HashMap<String, Double>();
@@ -165,15 +166,15 @@ class ClassifyWeibo {
 				}
 			});
 
-			// ´æ´¢Ã¿¸öÀà±ğµÄÎÄ¼ş´Ê»ãÏòÁ¿
+			// å­˜å‚¨æ¯ä¸ªç±»åˆ«çš„æ–‡ä»¶è¯æ±‡å‘é‡
 			List<List<String>> fileContent = new ArrayList<List<String>>();
 			if (files != null) {
 				for (File txt : files) {
 					String content = readtxt(txt.getAbsolutePath());
-					// ·Ö´Ê
+					// åˆ†è¯
 					List<String> word_arr = seg_list(content);
 					fileContent.add(word_arr);
-					// Í³¼ÆÃ¿¸ö´Ê³öÏÖµÄ¸öÊı
+					// ç»Ÿè®¡æ¯ä¸ªè¯å‡ºç°çš„ä¸ªæ•°
 					for (String word : word_arr) {
 						if (wordMap.containsKey(word)) {
 							Double wordCount = wordMap.get(word);
@@ -186,9 +187,9 @@ class ClassifyWeibo {
 				}
 			}
 
-			// Ã¿¸öÀà±ğ¶ÔÓ¦µÄ´ÊµäºÍÆµÊı
+			// æ¯ä¸ªç±»åˆ«å¯¹åº”çš„è¯å…¸å’Œé¢‘æ•°
 			classWordMap.put(classKey, wordMap);
-			// Ã¿¸öÀà±ğµÄÎÄÕÂÊıÄ¿
+			// æ¯ä¸ªç±»åˆ«çš„æ–‡ç« æ•°ç›®
 			classP.put(classKey, files.length);
 			actCount.addAndGet(files.length);
 			classContentMap.put(classKey, fileContent);
@@ -224,13 +225,13 @@ class ClassifyWeibo {
 	}
 
 	/**
-	 * ·ÖÀà
+	 * åˆ†ç±»
 	 * 
 	 * @param text
-	 * @return ·µ»Ø·Ö³öµÄÀà±ğÁĞ±í
+	 * @return è¿”å›åˆ†å‡ºçš„ç±»åˆ«åˆ—è¡¨
 	 */
 	private ArrayList<String> classify(String text) {
-		// ·Ö´Ê£¬²¢ÇÒÈ¥ÖØ
+		// åˆ†è¯ï¼Œå¹¶ä¸”å»é‡
 		List<String> text_words = seg_list(text);
 		System.out.println(text_words);
 		Map<String, Double> frequencyOfType = new HashMap<String, Double>();
@@ -242,35 +243,35 @@ class ClassifyWeibo {
 				Double wordCount = wordMap.get(word);
 				int articleCount = classP.get(classKey);
 
-				// ¼ÙÈçÕâ¸ö´ÊÔÚÀà±ğÏÂµÄËùÓĞÎÄÕÂÖĞÄ¾ÓĞ£¬ÄÇÃ´¸ø¶¨¸ö¼«Ğ¡µÄÖµ ²»Ó°Ïì¼ÆËã
+				// å‡å¦‚è¿™ä¸ªè¯åœ¨ç±»åˆ«ä¸‹çš„æ‰€æœ‰æ–‡ç« ä¸­æœ¨æœ‰ï¼Œé‚£ä¹ˆç»™å®šä¸ªæå°çš„å€¼ ä¸å½±å“è®¡ç®—
 				double term_frequency = (wordCount == null) ? ((double) 1 / (articleCount + 1))
 						: (wordCount / articleCount);
 
-				// ÎÄ±¾ÔÚÀà±ğµÄ¸ÅÂÊ ÔÚÕâÀï°´ÕÕÌØÕ÷ÏòÁ¿¶ÀÁ¢Í³¼Æ£¬¼´¸ÅÂÊ=´Ê»ã1/ÎÄÕÂÊı * ´Ê»ã2/ÎÄÕÂÊı ¡£¡£¡£
-				// µ±doubleÎŞÏŞĞ¡µÄÊ±ºò»á¹éÎª0£¬ÎªÁË±ÜÃâ *10
+				// æ–‡æœ¬åœ¨ç±»åˆ«çš„æ¦‚ç‡ åœ¨è¿™é‡ŒæŒ‰ç…§ç‰¹å¾å‘é‡ç‹¬ç«‹ç»Ÿè®¡ï¼Œå³æ¦‚ç‡=è¯æ±‡1/æ–‡ç« æ•° * è¯æ±‡2/æ–‡ç« æ•° ã€‚ã€‚ã€‚
+				// å½“doubleæ— é™å°çš„æ—¶å€™ä¼šå½’ä¸º0ï¼Œä¸ºäº†é¿å… *10
 
 				typeOfThis = typeOfThis * term_frequency * 10;
 				typeOfThis = ((typeOfThis == 0.0) ? Double.MIN_VALUE : typeOfThis);
 			}
 			typeOfThis = ((typeOfThis == 1.0) ? 0.0 : typeOfThis);
-			// ´ËÀà±ğÎÄÕÂ³öÏÖµÄ¸ÅÂÊ
+			// æ­¤ç±»åˆ«æ–‡ç« å‡ºç°çš„æ¦‚ç‡
 			double classOfAll = classP.get(classKey) / actCount.doubleValue();
-			// ¸ù¾İ±´Ò¶Ë¹¹«Ê½ $(A|B)=S(B|A)*S(A)/S(B),ÓÉÓÚ$(B)ÊÇ³£Êı£¬ÔÚÕâÀï²»×ö¼ÆËã,²»Ó°Ïì·ÖÀà½á¹û
+			// æ ¹æ®è´å¶æ–¯å…¬å¼ $(A|B)=S(B|A)*S(A)/S(B),ç”±äº$(B)æ˜¯å¸¸æ•°ï¼Œåœ¨è¿™é‡Œä¸åšè®¡ç®—,ä¸å½±å“åˆ†ç±»ç»“æœ
 			frequencyOfType.put(classKey, typeOfThis * classOfAll);
 		}
 		Collection<Double> c = frequencyOfType.values();
 		Object[] obj = c.toArray();
 		Arrays.sort(obj);
 		Set<Entry<String, Double>> set = frequencyOfType.entrySet();
-		// ´ı·µ»ØµÄÀà±ğÁĞ±í
+		// å¾…è¿”å›çš„ç±»åˆ«åˆ—è¡¨
 		ArrayList<String> arr = new ArrayList<String>();
 		Iterator<Entry<String, Double>> it = set.iterator();
 		while (it.hasNext()) {
-			// ÕÒµ½ËùÓĞkey-value¶Ô¼¯ºÏ
+			// æ‰¾åˆ°æ‰€æœ‰key-valueå¯¹é›†åˆ
 			Map.Entry entry = (Map.Entry) it.next();
-			// Í¨¹ıÅĞ¶ÏÊÇ·ñÓĞ¸ÃvalueÖµ
+			// é€šè¿‡åˆ¤æ–­æ˜¯å¦æœ‰è¯¥valueå€¼
 			if ((Double) entry.getValue() == (Double) obj[obj.length - 1]) {
-				// È¡µÃkeyÖµ
+				// å–å¾—keyå€¼
 				String s = (String) entry.getKey();
 				arr.add(classMap.get(s));
 			}
@@ -294,14 +295,14 @@ class ClassifyWeibo {
 				e.printStackTrace();
 			}
 		}
-		//°´Ê±¼ä¶ÔÎ¢²©ÁĞ±íÅÅĞò
+		//æŒ‰æ—¶é—´å¯¹å¾®åšåˆ—è¡¨æ’åº
 		List<Map.Entry<String, Date>> weiboArray = new ArrayList<Map.Entry<String, Date>>(weiboMap.entrySet());
 		Collections.sort(weiboArray, new Comparator<Map.Entry<String, Date>>() {
 			public int compare(Map.Entry<String, Date> o1, Map.Entry<String, Date> o2) {
 				return (o2.getValue().compareTo(o1.getValue()));
 			}
 		});
-		//·ÖÀà½á¹û
+		//åˆ†ç±»ç»“æœ
 		List<String> labelList = new ArrayList<String>();
 		for (int i = 0; i < 50; i++) {
 			try {
@@ -310,12 +311,11 @@ class ClassifyWeibo {
 				weiboid = weiboArray.get(i).getKey();
 				weiboContent=weiboDao.getContent(weiboid);
 				labelList=classify(weiboContent);
-	            weiboDao.insertLabel(weiboid,labelList);
+	             		recommendDAO.setWeiboLabels(weiboid,labelList);
 			} catch (Exception e) {
-				System.out.println("Ã»ÓĞµÚ " + (i + 1) + " ÌõÎ¢²©");
+				System.out.println("æ²¡æœ‰ç¬¬ " + (i + 1) + " æ¡å¾®åš");
 			}
 		}
-		// System.out.println(classify(""));
 		return true;
 	}
 
