@@ -59,7 +59,7 @@ class ClassifyWeibo {
 	}
 
 	private ClassifyWeibo() {
-		// 初始化类别
+		// 初始化
 		loadDic();
 		realTrain();
 	}
